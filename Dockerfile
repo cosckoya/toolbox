@@ -1,1 +1,1 @@
-FROM kalilinux/kali-last-release
+FROM kalilinux/kali-last-release:amd64
