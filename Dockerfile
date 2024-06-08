@@ -1,4 +1,4 @@
-FROM kalilinux/kali-last-release:amd64
+FROM kalilinux/kali-rolling:latest
 
 LABEL description = "Toolbox"
 LABEL maintainer = "cosckoya@mail.me"
