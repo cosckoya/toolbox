@@ -33,8 +33,8 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pipx separately to avoid issues with Python version not being set up
-RUN pip3 install --upgrade pip && \
-    pip3 install --no-cache-dir pipx && \
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir pipx && \
     pipx ensurepath
 
 # Clone the asdf repository
