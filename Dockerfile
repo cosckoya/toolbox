@@ -33,7 +33,8 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pipx separately to avoid issues with Python version not being set up
-RUN pip3 install --no-cache-dir pipx && \
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir pipx && \
     pipx ensurepath
 
 # Clone the asdf repository
@@ -43,4 +44,6 @@ RUN git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf
 ENV PATH="/root/.asdf/bin:/root/.asdf/shims:${PATH}"
 
 # Validate installation
-RUN python3 --version && pipx --version && asdf --version
+RUN python3 --version && \
+    pipx --version && \
+    asdf --version
