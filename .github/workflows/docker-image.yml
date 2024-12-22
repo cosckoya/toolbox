@@ -1,19 +1,20 @@
 name: Docker Image CI
 
 on:
+  # Schedule the workflow to run at 2:34 AM UTC daily
   #schedule:
   #  - cron: '34 2 * * *'
   push:
     branches: [ "main" ]
-    # Publish semver tags as releases.
+    # Optionally, publish semver tags as releases
     # tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
 
 env:
-  # Use docker.io for Docker Hub if empty
+  # Use GitHub Container Registry if REGISTRY is empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
+  # Use the GitHub repository as the image name
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -22,36 +23,33 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
+      # Needed to complete the identity challenge with sigstore/fulcio outside of PRs
       id-token: write
       
     steps:
+    # Step to checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Extract metadata (tags, labels) for Docker
-    # https://github.com/docker/metadata-action
+    # Step to extract metadata (tags, labels) for Docker
     - name: Extract Docker metadata
       id: meta
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     
-    # Install the cosign tool except on PR
-    # https://github.com/sigstore/cosign-installer
+    # Step to install the cosign tool except on PRs
     - name: Install cosign
       if: github.event_name != 'pull_request'
       uses: sigstore/cosign-installer@v3.5.0
       with:
         cosign-release: 'v2.2.4'
 
-    # Workaround: https://github.com/docker/build-push-action/issues/461
+    # Workaround to set up Docker buildx
     - name: Setup Docker buildx
       uses: docker/setup-buildx-action@v3
     
-    # Login against a Docker registry except on PR
-    # https://github.com/docker/login-action
+    # Step to log into the Docker registry except on PRs
     - name: Log into registry ${{ env.REGISTRY }}
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v3
@@ -60,8 +58,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    # Build and push Docker image with Buildx (don't push on PR)
-    # https://github.com/docker/build-push-action
+    # Step to build and push the Docker image with Buildx (don't push on PRs)
     - name: Build and push Docker image
       id: build-and-push
       uses: docker/build-push-action@v5
@@ -71,18 +68,14 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-    # Sign the resulting Docker image digest except on PRs.
-    # This will only write to the public Rekor transparency log when the Docker
-    # repository is public to avoid leaking data.  If you would like to publish
-    # transparency data even for private images, pass --force to cosign below.
-    # https://github.com/sigstore/cosign
+    # Step to sign the resulting Docker image digest except on PRs
     - name: Sign the published Docker image
       if: ${{ github.event_name != 'pull_request' }}
       env:
         COSIGN_EXPERIMENTAL: "true"
-      # This step uses the identity token to provision an ephemeral certificate
-      # against the sigstore community Fulcio instance.
+      # This step uses the identity token to provision an ephemeral certificate against the sigstore community Fulcio instance
       run: cosign sign ${{ steps.meta.outputs.tags }}@${{ steps.build-and-push.outputs.digest }}
       
-    #- name: Build the Docker image
-    #  run: docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}
+    # Optional build step (commented out)
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}
