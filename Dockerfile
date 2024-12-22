@@ -22,18 +22,27 @@ RUN apt-get update -qq && \
         nmap \
         unzip \
         git \
-        jq && \
-    # Install Python with specified version
+        jq \
+        build-essential \
+        libssl-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        libreadline-dev \
+        libsqlite3-dev \
+        libffi-dev \
+        libncurses5-dev \
+        libncursesw5-dev && \
+    # Install Python with the latest version
     apt-get install -qq -y --no-install-recommends \
-        python3.11 \
+        python3 \
         python3-pip && \
-    ln -sf /usr/bin/python3.11 /usr/bin/python3 && \
+    ln -sf /usr/bin/python3 /usr/bin/python && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pipx separately to avoid issues with Python version not being set up
-RUN pip install --upgrade pip && \
+RUN python3 -m pip install --upgrade pip && \
     pip install --no-cache-dir pipx && \
     pipx ensurepath
 
