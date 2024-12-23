@@ -35,8 +35,7 @@ RUN apt-get update -qq && \
     # Install Python with the latest version
     apt-get install -qq -y --no-install-recommends \
         python3 \
-        python3-pip \
-        pipx && \
+        python3-pip && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
