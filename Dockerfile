@@ -35,16 +35,12 @@ RUN apt-get update -qq && \
     # Install Python with the latest version
     apt-get install -qq -y --no-install-recommends \
         python3 \
-        python3-pip && \
+        python3-pip \
+        pipx \
     ln -sf /usr/bin/python3 /usr/bin/python && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Install pipx separately to avoid issues with Python version not being set up
-RUN python3 -m pip install --upgrade pip && \
-    pip install --no-cache-dir pipx && \
-    pipx ensurepath
 
 # Clone the asdf repository
 RUN git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf
