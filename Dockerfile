@@ -36,8 +36,7 @@ RUN apt-get update -qq && \
     apt-get install -qq -y --no-install-recommends \
         python3 \
         python3-pip \
-        pipx \
-    ln -sf /usr/bin/python3 /usr/bin/python && \
+        pipx && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
