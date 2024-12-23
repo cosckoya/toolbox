@@ -48,5 +48,4 @@ ENV PATH="/root/.asdf/bin:/root/.asdf/shims:${PATH}"
 
 # Validate installation
 RUN python3 --version && \
-    pipx --version && \
     asdf --version
