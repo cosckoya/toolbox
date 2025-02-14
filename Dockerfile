@@ -23,6 +23,7 @@ RUN apt-get update -qq && \
         unzip \
         git \
         jq \
+				asdf \
         build-essential \
         libssl-dev \
         zlib1g-dev \
@@ -41,10 +42,10 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone the asdf repository
-RUN git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf
+#RUN git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf
 
 # Set environment variables for asdf
-ENV PATH="/root/.asdf/bin:/root/.asdf/shims:${PATH}"
+#ENV PATH="/root/.asdf/bin:/root/.asdf/shims:${PATH}"
 
 # Validate installation
 RUN python3 --version && \
