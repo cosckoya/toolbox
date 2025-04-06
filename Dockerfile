@@ -22,31 +22,11 @@ RUN apt-get update -qq && \
         nmap \
         unzip \
         git \
-        jq \
-				asdf \
-        build-essential \
-        libssl-dev \
-        zlib1g-dev \
-        libbz2-dev \
-        libreadline-dev \
-        libsqlite3-dev \
-        libffi-dev \
-        libncurses5-dev \
-        libncursesw5-dev && \
+        jq && \
     # Install Python with the latest version
-    apt-get install -qq -y --no-install-recommends \
-        python3 \
-        python3-pip && \
+#    apt-get install -qq -y --no-install-recommends \
+#        python3 \
+#        python3-pip && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Clone the asdf repository
-#RUN git clone https://github.com/asdf-vm/asdf.git ${HOME}/.asdf
-
-# Set environment variables for asdf
-#ENV PATH="/root/.asdf/bin:/root/.asdf/shims:${PATH}"
-
-# Validate installation
-RUN python3 --version && \
-    asdf --version
