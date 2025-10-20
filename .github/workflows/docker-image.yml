@@ -1,13 +1,13 @@
 name: Docker Image CI
 
 on:
-  # Schedule the workflow to run at 2:34 AM UTC daily
-  #schedule:
-  #  - cron: '34 2 * * *'
+  # Ejecutar una vez a la semana: lunes a las 02:34 UTC
+  schedule:
+    - cron: '30 17 * * 3'
+  # Ejecutar cuando se haga push a main
   push:
     branches: [ "main" ]
-    # Optionally, publish semver tags as releases
-    # tags: [ 'v*.*.*' ]
+  # Mantener ejecución en PRs hacia main
   pull_request:
     branches: [ "main" ]
 
