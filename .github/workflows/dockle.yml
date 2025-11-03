@@ -1,0 +1,41 @@
+name: Dockle Container Security
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '30 8 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  dockle:
+    name: Run Dockle container security scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t cosckoya/toolbox:test .
+
+      - name: Run Dockle
+        uses: goodwithtech/dockle-action@v0.1.2
+        with:
+          image: cosckoya/toolbox:test
+          format: sarif
+          output: dockle-results.sarif
+          exit-code: '0'
+          exit-level: warn
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: dockle-results.sarif

@@ -1,0 +1,82 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# A sample workflow which checks out the code, builds a container
+# image using Docker and scans that image for vulnerabilities using
+# Snyk. The results are then uploaded to GitHub Security Code Scanning
+#
+# For more examples, including how to limit scans to only high-severity
+# issues, monitor images for newly disclosed vulnerabilities in Snyk and
+# fail PR checks for new vulnerabilities, see https://github.com/snyk/actions/
+
+name: Snyk Container
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '42 20 * * 4'
+
+permissions:
+  contents: read
+
+jobs:
+  snyk:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        load: true
+        tags: cosckoya/toolbox:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Run Snyk to check Docker image for vulnerabilities
+      continue-on-error: true
+      uses: snyk/actions/docker@0.4.0
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: cosckoya/toolbox:test
+        args: --file=Dockerfile --severity-threshold=high --exclude-base-image-vulns
+    
+    - name: Upload Snyk results to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: snyk.sarif
+        category: snyk
+    
+    - name: Run Snyk to check for open source vulnerabilities
+      continue-on-error: true
+      uses: snyk/actions/docker@0.4.0
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: test
+        image: cosckoya/toolbox:test
+        args: --file=Dockerfile --json-file-output=snyk-opensource.json
+    
+    - name: Upload Snyk open source results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: snyk-opensource-results
+        path: snyk-opensource.json

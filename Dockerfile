@@ -22,6 +22,7 @@ RUN apt-get update -qq && \
         nmap \
         unzip \
         git \
+<<<<<<< HEAD
         jq && \
     # Install Python with the latest version
 #    apt-get install -qq -y --no-install-recommends \
@@ -30,3 +31,31 @@ RUN apt-get update -qq && \
     # Cleanup
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+=======
+        jq \
+                        asdf \
+        build-essential \
+        libssl-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        libreadline-dev \
+        libsqlite3-dev \
+        libffi-dev \
+        libncurses5-dev \
+        libncursesw5-dev \
+        python3 \
+        python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Validate installation
+RUN python3 --version && \
+    asdf --version
+
+# Use non-root user for better security
+RUN useradd -m -s /bin/bash toolbox && \
+    chown -R toolbox:toolbox /home/toolbox
+
+USER toolbox
+WORKDIR /home/toolbox
+>>>>>>> 3adbcd8 (Toolbox updated)
