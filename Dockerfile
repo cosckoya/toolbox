@@ -22,18 +22,7 @@ RUN apt-get update -qq && \
         nmap \
         unzip \
         git \
-<<<<<<< HEAD
-        jq && \
-    # Install Python with the latest version
-#    apt-get install -qq -y --no-install-recommends \
-#        python3 \
-#        python3-pip && \
-    # Cleanup
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-=======
         jq \
-                        asdf \
         build-essential \
         libssl-dev \
         zlib1g-dev \
@@ -48,9 +37,14 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Install asdf
+RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.18.0 && \
+    echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc && \
+    echo '. "$HOME/.asdf/completions/asdf.bash"' >> ~/.bashrc
+
 # Validate installation
 RUN python3 --version && \
-    asdf --version
+    bash -c '. ~/.asdf/asdf.sh && asdf --version'
 
 # Use non-root user for better security
 RUN useradd -m -s /bin/bash toolbox && \
@@ -58,4 +52,3 @@ RUN useradd -m -s /bin/bash toolbox && \
 
 USER toolbox
 WORKDIR /home/toolbox
->>>>>>> 3adbcd8 (Toolbox updated)
